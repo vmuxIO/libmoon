@@ -3,6 +3,7 @@ local mod = {}
 local dpdkc = require "dpdkc"
 local ffi = require "ffi"
 
+mod.net_ice = require "driver.ice"
 mod.net_i40e = require "driver.i40e"
 mod.net_ixgbe = require "driver.ixgbe"
 mod.net_ixgbevf = require "driver.ixgbevf"
