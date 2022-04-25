@@ -97,7 +97,7 @@ function timestamper:measureLatency(pktSize, packetModifier, maxWait)
 			self.rxQueue.dev:reconfigureUdpTimestampFilter(self.rxQueue, buf:getUdpPacket())
 		end
 	end
-	mod.syncClocks(self.txDev, self.rxDev)
+	-- TODO FIXME EVIL mod.syncClocks(self.txDev, self.rxDev)
 	-- clear any "leftover" timestamps
 	self.rxDev:clearTimestamps()
 	self.txQueue:send(self.txBufs)
@@ -156,7 +156,11 @@ function timestamper:measureLatency(pktSize, packetModifier, maxWait)
 		return nil, numPkts
 	else
 		-- happens when hotplugging cables
-		log:warn("Failed to timestamp packet on transmission")
+    if tx == nil then
+	  	log:warn("Failed to timestamp packet on transmission: nil")
+    else
+	  	log:warn("Failed to timestamp packet on transmission: %d", tx)
+    end
 		timer:new(maxWait):wait()
 		return nil, numPkts
 	end
