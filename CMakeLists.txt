@@ -112,7 +112,9 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/x86_64-native-linux-gcc/lib
+  #${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/x86_64-native-linux-gcc/lib
+  ${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/build/lib
+  ${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/build/drivers
 	${CMAKE_CURRENT_SOURCE_DIR}/deps/luajit/usr/local/lib
 	${CMAKE_CURRENT_SOURCE_DIR}/deps/highwayhash/lib
 )
