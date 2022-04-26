@@ -6,6 +6,7 @@
 #include <rte_config.h>
 #include <rte_mbuf.h>
 #include <rte_mempool.h>
+#include <ethdev_driver.h>
 
 struct pcapRecHeader {
 	uint32_t ts_sec;   /* timestamp seconds */
@@ -14,6 +15,15 @@ struct pcapRecHeader {
 	uint32_t orig_len; /* actual length of packet */
 	uint8_t data[];
 };
+
+typedef uint64_t tsc_t;
+static int tsc_dynfield_offset = -1;
+
+static inline tsc_t *
+tsc_field(struct rte_mbuf *mbuf)
+{
+       return RTE_MBUF_DYNFIELD(mbuf, tsc_dynfield_offset, tsc_t *);
+}
 
 extern "C" {
 	void libmoon_write_pcap(pcapRecHeader* dst, const void* packet, uint32_t len, uint32_t orig_len, uint32_t ts_sec, uint32_t ts_usec) {
@@ -39,7 +49,7 @@ extern "C" {
 		}
 		res->pkt_len = src->incl_len;
 		res->data_len = copy_len + zero_fill_len;
-		res->udata64 = src->ts_sec * 1000000ULL + src->ts_usec;
+		*tsc_field(res) = src->ts_sec * 1000000ULL + src->ts_usec;
 		uint8_t* data = rte_pktmbuf_mtod(res, uint8_t*);
 		memcpy(data, &src->data, copy_len);
 		memset(data + copy_len, 0, zero_fill_len);

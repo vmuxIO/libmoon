@@ -204,7 +204,7 @@ const char* dpdk_get_driver_name(int port) {
 }
 
 uint64_t dpdk_get_mac_addr(int port, char* buf) {
-	struct ether_addr addr;
+	struct rte_ether_addr addr;
 	rte_eth_macaddr_get(port, &addr);
 	if (buf) {
 		sprintf(buf, "%02X:%02X:%02X:%02X:%02X:%02X", addr.addr_bytes[0], addr.addr_bytes[1], addr.addr_bytes[2], addr.addr_bytes[3], addr.addr_bytes[4], addr.addr_bytes[5]);
@@ -281,6 +281,15 @@ uint16_t dpdk_try_send_single_packet(uint16_t port_id, uint16_t queue_id, struct
 	return sent;
 }
 
+typedef uint64_t tsc_t;
+static int tsc_dynfield_offset = -1;
+
+static inline tsc_t *
+tsc_field(struct rte_mbuf *mbuf)
+{
+       return RTE_MBUF_DYNFIELD(mbuf, tsc_dynfield_offset, tsc_t *);
+}
+
 // receive packets and save the tsc at the time of the rx call
 // this prevents potential gc/jit pauses right between the rdtsc and rx calls
 uint16_t dpdk_receive_with_timestamps_software(uint16_t port_id, uint16_t queue_id, struct rte_mbuf* rx_pkts[], uint16_t nb_pkts) {
@@ -290,7 +299,8 @@ uint16_t dpdk_receive_with_timestamps_software(uint16_t port_id, uint16_t queue_
 		uint16_t rx = rte_eth_rx_burst(port_id, queue_id, rx_pkts, nb_pkts);
 		uint16_t prev_pkt_size = 0;
 		for (int i = 0; i < rx; i++) {
-			rx_pkts[i]->udata64 = tsc + prev_pkt_size * cycles_per_byte;
+			/*rx_pkts[i]->udata64 = tsc + prev_pkt_size * cycles_per_byte;*/
+			*tsc_field(rx_pkts[i]) = tsc + prev_pkt_size * cycles_per_byte;
 			prev_pkt_size = rx_pkts[i]->pkt_len + 24;
 		}
 		if (rx > 0) {
