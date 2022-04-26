@@ -78,7 +78,25 @@ SET(ALL_LIBS
 )
 
 INCLUDE_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/x86_64-native-linux-gcc/include
+  #${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/x86_64-native-linux-gcc/include
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/eal/include
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/eal/linux/include
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/eal/x86/include
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/mbuf
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/ethdev
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/net
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/mempool
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/ring
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/meter
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/pci
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/security
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/kvargs
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/cryptodev
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/hash
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/lib/rcu
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/config
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/build
+	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/drivers/bus/pci
 	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/drivers/net/bnxt
 	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/drivers/net/ixgbe/base
 	${CMAKE_CURRENT_SOURCE_DIR}/deps/dpdk/drivers/net/ixgbe
