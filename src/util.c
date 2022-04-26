@@ -26,7 +26,7 @@ uint64_t read_rdtsc() {
 }
 
 
-static inline uint16_t get_ipv4_psd_sum (struct ipv4_hdr* ip_hdr) {
+static inline uint16_t get_ipv4_psd_sum (struct rte_ipv4_hdr* ip_hdr) {
 	uint16_t len = ip_hdr->total_length;
 	// TODO: depends on CPU endianess
 	// and yes, this optimization is actually worth it:
@@ -34,10 +34,10 @@ static inline uint16_t get_ipv4_psd_sum (struct ipv4_hdr* ip_hdr) {
 	//	* 1.2% in l3-multi-flows.lua 
 	if (len & 0xFF) { // lower (network byte order) byte used --> len >= 256
 		// just use swap
-		len = rte_bswap16((uint16_t)(rte_bswap16(len) - sizeof(struct ipv4_hdr)));
+		len = rte_bswap16((uint16_t)(rte_bswap16(len) - sizeof(struct rte_ipv4_hdr)));
 	} else {
 		// can use shift instead, yeah.
-		len = ((len >> 8) - sizeof(struct ipv4_hdr)) << 8;
+		len = ((len >> 8) - sizeof(struct rte_ipv4_hdr)) << 8;
 	}
 	uint64_t sum = (uint64_t) ip_hdr->src_addr + (uint64_t) ip_hdr->dst_addr + (uint64_t) ((ip_hdr->next_proto_id << 24) | len);
 	uint32_t lower = sum & 0xFFFFFFFF;
@@ -54,7 +54,7 @@ static inline uint16_t get_ipv4_psd_sum (struct ipv4_hdr* ip_hdr) {
 // TODO: cope with flexible offsets
 // offset: udp - 20; tcp - 25
 void calc_ipv4_pseudo_header_checksum(void* data, int offset) {
-	uint16_t csum = get_ipv4_psd_sum((struct ipv4_hdr*) ((uint8_t*)data + 14));
+	uint16_t csum = get_ipv4_psd_sum((struct rte_ipv4_hdr*) ((uint8_t*)data + 14));
 	((uint16_t*) data)[offset] = csum;
 }
 
@@ -85,7 +85,7 @@ static inline uint16_t get_16b_sum(uint16_t *ptr16, uint32_t nr)
 	return (uint16_t)sum;
 }
 
-static inline uint16_t get_ipv6_psd_sum (struct ipv6_hdr * ip_hdr)
+static inline uint16_t get_ipv6_psd_sum (struct rte_ipv6_hdr * ip_hdr)
 {
 	/* Pseudo Header for IPv6/UDP/TCP checksum */
 	union ipv6_psd_header {
@@ -110,7 +110,7 @@ static inline uint16_t get_ipv6_psd_sum (struct ipv6_hdr * ip_hdr)
 // TODO: cope with flexible offsets and different protocols
 // offset: udp - 30; tcp - 35
 void calc_ipv6_pseudo_header_checksum(void* data, int offset) {
-	uint16_t csum = get_ipv6_psd_sum((struct ipv6_hdr*) ((uint8_t*)data + 14));
+	uint16_t csum = get_ipv6_psd_sum((struct rte_ipv6_hdr*) ((uint8_t*)data + 14));
 	((uint16_t*) data)[offset] = csum;
 }
 
