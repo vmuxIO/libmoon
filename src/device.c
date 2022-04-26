@@ -9,6 +9,7 @@
 #include <rte_eth_ctrl.h>
 #include <rte_pci.h>
 #include <rte_bus_pci.h>
+#include <ethdev_driver.h>
 
 #include "rdtsc.h"
 
