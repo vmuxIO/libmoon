@@ -17,7 +17,7 @@ local eth        = require "proto.ethernet"
 local E          = require "syscall".c.E
 
 function mod.numDevices()
-	return dpdkc.rte_eth_dev_count();
+	return dpdkc.rte_eth_dev_count_total();
 end
 
 local dev = {}
@@ -96,8 +96,8 @@ function mod.config(args)
 	if args.port >= dpdkc.dpdk_get_max_ports() then
 		log:fatal("maximum number of supported ports is %d, this can be changed with the DPDK compile-time configuration variable RTE_MAX_ETHPORTS\n", dpdkc.dpdk_get_max_ports())
 	end
-	if args.port >= dpdkc.rte_eth_dev_count() then
-		log:fatal("there are only %d ports, tried to configure port id %d", dpdkc.rte_eth_dev_count(), args.port)
+	if args.port >= dpdkc.rte_eth_dev_count_total() then
+		log:fatal("there are only %d ports, tried to configure port id %d", dpdkc.rte_eth_dev_count_total(), args.port)
 	end
 	if mod.get(args.port) and mod.get(args.port).initialized then
 		log:warn("Device %d already configured, skipping initilization", args.port)
@@ -620,7 +620,7 @@ end
 
 function mod.getDevices()
 	local result = {}
-	for i = 0, dpdkc.rte_eth_dev_count() - 1 do
+	for i = 0, dpdkc.rte_eth_dev_count_total() - 1 do
 		local dev = mod.get(i)
 		result[#result + 1] = { id = i, mac = dev:getMacString(i), name = dev:getName(i) }
 	end

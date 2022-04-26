@@ -275,7 +275,7 @@ ffi.cdef[[
 
 	// devices
 	int rte_pci_probe();
-	int rte_eth_dev_count();
+	int rte_eth_dev_count_total();
 	uint64_t dpdk_get_mac_addr(int port, char* buf);
 	void rte_eth_link_get(uint8_t port, struct rte_eth_link* link);
 	void rte_eth_link_get_nowait(uint8_t port, struct rte_eth_link* link);
