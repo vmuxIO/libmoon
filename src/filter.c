@@ -128,73 +128,75 @@ print_fdir_flow_type(uint32_t flow_types_mask) {
 }
 
 void fdir_get_infos(uint32_t port_id) {
-	struct rte_eth_fdir_stats fdir_stat;
-	struct rte_eth_fdir_info fdir_info;
-	int ret;
+  return; // eth_dev_filter_supported does not exist anymore.
+          // now you should use struct rte_eth_dev_info.rx_offload_capa (rte_eth_dev_info_get())
+	//struct rte_eth_fdir_stats fdir_stat;
+	//struct rte_eth_fdir_info fdir_info;
+	//int ret;
 
-	static const char *fdir_stats_border = "########################";
+	//static const char *fdir_stats_border = "########################";
 
-	ret = rte_eth_dev_filter_supported(port_id, RTE_ETH_FILTER_FDIR);
-	if (ret < 0) {
-		printf("\n FDIR is not supported on port %-2d\n",
-			port_id);
-		return;
-	}
+	//ret = rte_eth_dev_filter_supported(port_id, RTE_ETH_FILTER_FDIR);
+	//if (ret < 0) {
+	//	printf("\n FDIR is not supported on port %-2d\n",
+	//		port_id);
+	//	return;
+	//}
 
-	memset(&fdir_info, 0, sizeof(fdir_info));
-	rte_eth_dev_filter_ctrl(port_id, RTE_ETH_FILTER_FDIR,
-			       RTE_ETH_FILTER_INFO, &fdir_info);
-	memset(&fdir_stat, 0, sizeof(fdir_stat));
-	rte_eth_dev_filter_ctrl(port_id, RTE_ETH_FILTER_FDIR,
-			       RTE_ETH_FILTER_STATS, &fdir_stat);
-	printf("\n  %s FDIR infos for port %-2d     %s\n",
-	       fdir_stats_border, port_id, fdir_stats_border);
-	printf("  MODE: ");
-	if (fdir_info.mode == RTE_FDIR_MODE_PERFECT)
-		printf("  PERFECT\n");
-	else if (fdir_info.mode == RTE_FDIR_MODE_PERFECT_MAC_VLAN)
-		printf("  PERFECT-MAC-VLAN\n");
-	else if (fdir_info.mode == RTE_FDIR_MODE_PERFECT_TUNNEL)
-		printf("  PERFECT-TUNNEL\n");
-	else if (fdir_info.mode == RTE_FDIR_MODE_SIGNATURE)
-		printf("  SIGNATURE\n");
-	else
-		printf("  DISABLE\n");
-	if (fdir_info.mode != RTE_FDIR_MODE_PERFECT_MAC_VLAN
-		&& fdir_info.mode != RTE_FDIR_MODE_PERFECT_TUNNEL) {
-		printf("  SUPPORTED FLOW TYPE: ");
-		print_fdir_flow_type(fdir_info.flow_types_mask[0]);
-	}
-	printf("  FLEX PAYLOAD INFO:\n");
-	printf("  max_len:       %-10"PRIu32"  payload_limit: %-10"PRIu32"\n"
-	       "  payload_unit:  %-10"PRIu32"  payload_seg:   %-10"PRIu32"\n"
-	       "  bitmask_unit:  %-10"PRIu32"  bitmask_num:   %-10"PRIu32"\n",
-		fdir_info.max_flexpayload, fdir_info.flex_payload_limit,
-		fdir_info.flex_payload_unit,
-		fdir_info.max_flex_payload_segment_num,
-		fdir_info.flex_bitmask_unit, fdir_info.max_flex_bitmask_num);
-	printf("  MASK: ");
-	print_fdir_mask(&fdir_info.mask);
-	if (fdir_info.flex_conf.nb_payloads > 0) {
-		printf("  FLEX PAYLOAD SRC OFFSET:");
-		print_fdir_flex_payload(&fdir_info.flex_conf, fdir_info.max_flexpayload);
-	}
-	if (fdir_info.flex_conf.nb_flexmasks > 0) {
-		printf("  FLEX MASK CFG:");
-		print_fdir_flex_mask(&fdir_info.flex_conf, fdir_info.max_flexpayload);
-	}
-	printf("  guarant_count: %-10"PRIu32"  best_count:    %"PRIu32"\n",
-	       fdir_stat.guarant_cnt, fdir_stat.best_cnt);
-	printf("  guarant_space: %-10"PRIu32"  best_space:    %"PRIu32"\n",
-	       fdir_info.guarant_spc, fdir_info.best_spc);
-	printf("  collision:     %-10"PRIu32"  free:          %"PRIu32"\n"
-	       "  maxhash:       %-10"PRIu32"  maxlen:        %"PRIu32"\n"
-	       "  add:	         %-10"PRIu64"  remove:        %"PRIu64"\n"
-	       "  f_add:         %-10"PRIu64"  f_remove:      %"PRIu64"\n",
-	       fdir_stat.collision, fdir_stat.free,
-	       fdir_stat.maxhash, fdir_stat.maxlen,
-	       fdir_stat.add, fdir_stat.remove,
-	       fdir_stat.f_add, fdir_stat.f_remove);
-	printf("  %s############################%s\n",
-	       fdir_stats_border, fdir_stats_border);
+	//memset(&fdir_info, 0, sizeof(fdir_info));
+	//rte_eth_dev_filter_ctrl(port_id, RTE_ETH_FILTER_FDIR,
+	//		       RTE_ETH_FILTER_INFO, &fdir_info);
+	//memset(&fdir_stat, 0, sizeof(fdir_stat));
+	//rte_eth_dev_filter_ctrl(port_id, RTE_ETH_FILTER_FDIR,
+	//		       RTE_ETH_FILTER_STATS, &fdir_stat);
+	//printf("\n  %s FDIR infos for port %-2d     %s\n",
+	//       fdir_stats_border, port_id, fdir_stats_border);
+	//printf("  MODE: ");
+	//if (fdir_info.mode == RTE_FDIR_MODE_PERFECT)
+	//	printf("  PERFECT\n");
+	//else if (fdir_info.mode == RTE_FDIR_MODE_PERFECT_MAC_VLAN)
+	//	printf("  PERFECT-MAC-VLAN\n");
+	//else if (fdir_info.mode == RTE_FDIR_MODE_PERFECT_TUNNEL)
+	//	printf("  PERFECT-TUNNEL\n");
+	//else if (fdir_info.mode == RTE_FDIR_MODE_SIGNATURE)
+	//	printf("  SIGNATURE\n");
+	//else
+	//	printf("  DISABLE\n");
+	//if (fdir_info.mode != RTE_FDIR_MODE_PERFECT_MAC_VLAN
+	//	&& fdir_info.mode != RTE_FDIR_MODE_PERFECT_TUNNEL) {
+	//	printf("  SUPPORTED FLOW TYPE: ");
+	//	print_fdir_flow_type(fdir_info.flow_types_mask[0]);
+	//}
+	//printf("  FLEX PAYLOAD INFO:\n");
+	//printf("  max_len:       %-10"PRIu32"  payload_limit: %-10"PRIu32"\n"
+	//       "  payload_unit:  %-10"PRIu32"  payload_seg:   %-10"PRIu32"\n"
+	//       "  bitmask_unit:  %-10"PRIu32"  bitmask_num:   %-10"PRIu32"\n",
+	//	fdir_info.max_flexpayload, fdir_info.flex_payload_limit,
+	//	fdir_info.flex_payload_unit,
+	//	fdir_info.max_flex_payload_segment_num,
+	//	fdir_info.flex_bitmask_unit, fdir_info.max_flex_bitmask_num);
+	//printf("  MASK: ");
+	//print_fdir_mask(&fdir_info.mask);
+	//if (fdir_info.flex_conf.nb_payloads > 0) {
+	//	printf("  FLEX PAYLOAD SRC OFFSET:");
+	//	print_fdir_flex_payload(&fdir_info.flex_conf, fdir_info.max_flexpayload);
+	//}
+	//if (fdir_info.flex_conf.nb_flexmasks > 0) {
+	//	printf("  FLEX MASK CFG:");
+	//	print_fdir_flex_mask(&fdir_info.flex_conf, fdir_info.max_flexpayload);
+	//}
+	//printf("  guarant_count: %-10"PRIu32"  best_count:    %"PRIu32"\n",
+	//       fdir_stat.guarant_cnt, fdir_stat.best_cnt);
+	//printf("  guarant_space: %-10"PRIu32"  best_space:    %"PRIu32"\n",
+	//       fdir_info.guarant_spc, fdir_info.best_spc);
+	//printf("  collision:     %-10"PRIu32"  free:          %"PRIu32"\n"
+	//       "  maxhash:       %-10"PRIu32"  maxlen:        %"PRIu32"\n"
+	//       "  add:	         %-10"PRIu64"  remove:        %"PRIu64"\n"
+	//       "  f_add:         %-10"PRIu64"  f_remove:      %"PRIu64"\n",
+	//       fdir_stat.collision, fdir_stat.free,
+	//       fdir_stat.maxhash, fdir_stat.maxlen,
+	//       fdir_stat.add, fdir_stat.remove,
+	//       fdir_stat.f_add, fdir_stat.f_remove);
+	//printf("  %s############################%s\n",
+	//       fdir_stats_border, fdir_stats_border);
 }
