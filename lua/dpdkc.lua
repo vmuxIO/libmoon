@@ -129,7 +129,7 @@ ffi.cdef[[
 		RTE_FDIR_L4TYPE_SCTP,           /**< SCTP. */
 	};
 
-
+// TODO cant find
 	struct rte_fdir_masks {
 		uint8_t only_ip_flow;
 		uint8_t vlan_id;
@@ -145,95 +145,215 @@ ffi.cdef[[
 		uint16_t dst_port_mask;
 	};
 
-	struct rte_eth_desc_lim {
-		uint16_t nb_max;   
-		uint16_t nb_min;   
-		uint16_t nb_align;
-		uint16_t nb_seg_max;
-		uint16_t nb_mtu_seg_max; 
-	};
-	struct rte_eth_thresh {
-		uint8_t pthresh; 
-		uint8_t hthresh; 
-		uint8_t wthresh; 
-	};
-	struct rte_eth_switch_info {
-		const char *name;	/**< switch name */
-		uint16_t domain_id;	/**< switch domain id */
-		uint16_t port_id;
-	};
-	struct rte_eth_dev_portconf {
-		uint16_t burst_size; /**< Device-preferred burst size */
-		uint16_t ring_size; /**< Device-preferred size of queue rings */
-		uint16_t nb_queues; /**< Device-preferred number of queues */
-	};
-	struct rte_eth_rxconf {
-		struct rte_eth_thresh rx_thresh; /**< RX ring threshold registers. */
-		uint16_t rx_free_thresh; /**< Drives the freeing of RX descriptors. */
-		uint8_t rx_drop_en; /**< Drop packets if no descriptors are available. */
-		uint8_t rx_deferred_start; /**< Do not start queue with rte_eth_dev_start(). */
-		uint64_t offloads;
-	};
+/**
+ * A structure contains information about HW descriptor ring limitations.
+ */
+struct rte_eth_desc_lim {
+	uint16_t nb_max;   /**< Max allowed number of descriptors. */
+	uint16_t nb_min;   /**< Min allowed number of descriptors. */
+	uint16_t nb_align; /**< Number of descriptors should be aligned to. */
 
-	struct rte_eth_txconf {
-		struct rte_eth_thresh tx_thresh; /**< TX ring threshold registers. */
-		uint16_t tx_rs_thresh; /**< Drives the setting of RS bit on TXDs. */
-		uint16_t tx_free_thresh; /**< Start freeing TX buffers if there are
-				      less free descriptors than this value. */
+	/**
+	 * Max allowed number of segments per whole packet.
+	 *
+	 * - For TSO packet this is the total number of data descriptors allowed
+	 *   by device.
+	 *
+	 * @see nb_mtu_seg_max
+	 */
+	uint16_t nb_seg_max;
 
-		uint8_t tx_deferred_start; /**< Do not start queue with rte_eth_dev_start(). */
-		uint64_t offloads;
-	};
+	/**
+	 * Max number of segments per one MTU.
+	 *
+	 * - For non-TSO packet, this is the maximum allowed number of segments
+	 *   in a single transmit packet.
+	 *
+	 * - For TSO packet each segment within the TSO may span up to this
+	 *   value.
+	 *
+	 * @see nb_seg_max
+	 */
+	uint16_t nb_mtu_seg_max;
+};
 
-	struct rte_eth_dev_info {
-		void *device; /** Generic device information */
-		const char *driver_name; /**< Device Driver name. */
-		unsigned int if_index; /**< Index to bound host interface, or 0 if none.
-					 Use if_indextoname() to translate into an interface name. */
-		uint16_t min_mtu;       /**< Minimum MTU allowed */
-		uint16_t max_mtu;       /**< Maximum MTU allowed */
-		const uint32_t *dev_flags; /**< Device flags */
-		uint32_t min_rx_bufsize; /**< Minimum size of RX buffer. */
-		uint32_t max_rx_pktlen; /**< Maximum configurable length of RX pkt. */
-		uint16_t max_rx_queues; /**< Maximum number of RX queues. */
-		uint16_t max_tx_queues; /**< Maximum number of TX queues. */
-		uint32_t max_mac_addrs; /**< Maximum number of MAC addresses. */
-		uint32_t max_hash_mac_addrs;
-		/** Maximum number of hash MAC addresses for MTA and UTA. */
-		uint16_t max_vfs; /**< Maximum number of VFs. */
-		uint16_t max_vmdq_pools; /**< Maximum number of VMDq pools. */
-		uint64_t rx_offload_capa;
-		/**< All RX offload capabilities including all per-queue ones */
-		uint64_t tx_offload_capa;
-		/**< All TX offload capabilities including all per-queue ones */
-		uint64_t rx_queue_offload_capa;
-		/**< Device per-queue RX offload capabilities. */
-		uint64_t tx_queue_offload_capa;
-		/**< Device per-queue TX offload capabilities. */
-		uint16_t reta_size;
-		/**< Device redirection table size, the total number of entries. */
-		uint8_t hash_key_size; /**< Hash key size in bytes */
-		/** Bit mask of RSS offloads, the bit offset also means flow type */
-		uint64_t flow_type_rss_offloads;
-		struct rte_eth_rxconf default_rxconf; /**< Default RX configuration */
-		struct rte_eth_txconf default_txconf; /**< Default TX configuration */
-		uint16_t vmdq_queue_base; /**< First queue ID for VMDQ pools. */
-		uint16_t vmdq_queue_num;  /**< Queue number for VMDQ pools. */
-		uint16_t vmdq_pool_base;  /**< First ID of VMDQ pools. */
-		struct rte_eth_desc_lim rx_desc_lim;  /**< RX descriptors limits */
-		struct rte_eth_desc_lim tx_desc_lim;  /**< TX descriptors limits */
-		uint32_t speed_capa;  /**< Supported speeds bitmap (ETH_LINK_SPEED_). */
-		/** Configured number of rx/tx queues */
-		uint16_t nb_rx_queues; /**< Number of RX queues. */
-		uint16_t nb_tx_queues; /**< Number of TX queues. */
-		/** Rx parameter recommendations */
-		struct rte_eth_dev_portconf default_rxportconf;
-		/** Tx parameter recommendations */
-		struct rte_eth_dev_portconf default_txportconf;
-		/** Generic device capabilities (RTE_ETH_DEV_CAPA_). */
-		uint64_t dev_capa;
-		struct rte_eth_switch_info switch_info;
-	};
+/**
+ * A structure used to configure the ring threshold registers of an Rx/Tx
+ * queue for an Ethernet port.
+ */
+struct rte_eth_thresh {
+	uint8_t pthresh; /**< Ring prefetch threshold. */
+	uint8_t hthresh; /**< Ring host threshold. */
+	uint8_t wthresh; /**< Ring writeback threshold. */
+};
+
+struct rte_eth_switch_info {
+	const char *name;	/**< switch name */
+	uint16_t domain_id;	/**< switch domain ID */
+	/**
+	 * Mapping to the devices physical switch port as enumerated from the
+	 * perspective of the embedded interconnect/switch. For SR-IOV enabled
+	 * device this may correspond to the VF_ID of each virtual function,
+	 * but each driver should explicitly define the mapping of switch
+	 * port identifier to that physical interconnect/switch
+	 */
+	uint16_t port_id;
+	/**
+	 * Shared Rx queue sub-domain boundary. Only ports in same Rx domain
+	 * and switch domain can share Rx queue. Valid only if device advertised
+	 * RTE_ETH_DEV_CAPA_RXQ_SHARE capability.
+	 */
+	uint16_t rx_domain;
+};
+
+/**
+ * Preferred Rx/Tx port parameters.
+ * There are separate instances of this structure for transmission
+ * and reception respectively.
+ */
+struct rte_eth_dev_portconf {
+	uint16_t burst_size; /**< Device-preferred burst size */
+	uint16_t ring_size; /**< Device-preferred size of queue rings */
+	uint16_t nb_queues; /**< Device-preferred number of queues */
+};
+
+/**
+ * A structure used to configure an Rx ring of an Ethernet port.
+ */
+struct rte_eth_rxconf {
+	struct rte_eth_thresh rx_thresh; /**< Rx ring threshold registers. */
+	uint16_t rx_free_thresh; /**< Drives the freeing of Rx descriptors. */
+	uint8_t rx_drop_en; /**< Drop packets if no descriptors are available. */
+	uint8_t rx_deferred_start; /**< Do not start queue with rte_eth_dev_start(). */
+	uint16_t rx_nseg; /**< Number of descriptions in rx_seg array. */
+	/**
+	 * Share group index in Rx domain and switch domain.
+	 * Non-zero value to enable Rx queue share, zero value disable share.
+	 * PMD is responsible for Rx queue consistency checks to avoid member
+	 * port's configuration contradict to each other.
+	 */
+	uint16_t share_group;
+	uint16_t share_qid; /**< Shared Rx queue ID in group */
+	/**
+	 * Per-queue Rx offloads to be set using RTE_ETH_RX_OFFLOAD_* flags.
+	 * Only offloads set on rx_queue_offload_capa or rx_offload_capa
+	 * fields on rte_eth_dev_info structure are allowed to be set.
+	 */
+	uint64_t offloads;
+	/**
+	 * Points to the array of segment descriptions for an entire packet.
+	 * Array elements are properties for consecutive Rx segments.
+	 *
+	 * The supported capabilities of receiving segmentation is reported
+	 * in rte_eth_dev_info.rx_seg_capa field.
+	 */
+	union rte_eth_rxseg *rx_seg;
+
+	uint64_t reserved_64s[2]; /**< Reserved for future fields */
+	void *reserved_ptrs[2];   /**< Reserved for future fields */
+};
+
+/**
+ * A structure used to configure a Tx ring of an Ethernet port.
+ */
+  struct rte_eth_txconf {
+  	struct rte_eth_thresh tx_thresh; /**< Tx ring threshold registers. */
+  	uint16_t tx_rs_thresh; /**< Drives the setting of RS bit on TXDs. */
+  	uint16_t tx_free_thresh; /**< Start freeing Tx buffers if there are
+  				      less free descriptors than this value. */
+  
+  	uint8_t tx_deferred_start; /**< Do not start queue with rte_eth_dev_start(). */
+  	/**
+  	 * Per-queue Tx offloads to be set  using RTE_ETH_TX_OFFLOAD_* flags.
+  	 * Only offloads set on tx_queue_offload_capa or tx_offload_capa
+  	 * fields on rte_eth_dev_info structure are allowed to be set.
+  	 */
+  	uint64_t offloads;
+  
+  	uint64_t reserved_64s[2]; /**< Reserved for future fields */
+  	void *reserved_ptrs[2];   /**< Reserved for future fields */
+  };
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this structure may change without prior notice.
+ *
+ * Ethernet device Rx buffer segmentation capabilities.
+ */
+struct rte_eth_rxseg_capa {
+	__extension__
+	uint32_t multi_pools:1; /**< Supports receiving to multiple pools.*/
+	uint32_t offset_allowed:1; /**< Supports buffer offsets. */
+	uint32_t offset_align_log2:4; /**< Required offset alignment. */
+	uint16_t max_nseg; /**< Maximum amount of segments to split. */
+	uint16_t reserved; /**< Reserved field. */
+};
+
+/**
+ * A structure used to retrieve the contextual information of
+ * an Ethernet device, such as the controlling driver of the
+ * device, etc...
+ */
+  struct rte_eth_dev_info {
+  	void *device; /**< Generic device information */
+  	const char *driver_name; /**< Device Driver name. */
+  	unsigned int if_index; /**< Index to bound host interface, or 0 if none.
+  		Use if_indextoname() to translate into an interface name. */
+  	uint16_t min_mtu;	/**< Minimum MTU allowed */
+  	uint16_t max_mtu;	/**< Maximum MTU allowed */
+  	const uint32_t *dev_flags; /**< Device flags */
+  	uint32_t min_rx_bufsize; /**< Minimum size of Rx buffer. */
+  	uint32_t max_rx_pktlen; /**< Maximum configurable length of Rx pkt. */
+  	/** Maximum configurable size of LRO aggregated packet. */
+  	uint32_t max_lro_pkt_size;
+  	uint16_t max_rx_queues; /**< Maximum number of Rx queues. */
+  	uint16_t max_tx_queues; /**< Maximum number of Tx queues. */
+  	uint32_t max_mac_addrs; /**< Maximum number of MAC addresses. */
+  	/** Maximum number of hash MAC addresses for MTA and UTA. */
+  	uint32_t max_hash_mac_addrs;
+  	uint16_t max_vfs; /**< Maximum number of VFs. */
+  	uint16_t max_vmdq_pools; /**< Maximum number of VMDq pools. */
+  	struct rte_eth_rxseg_capa rx_seg_capa; /**< Segmentation capability.*/
+  	/** All Rx offload capabilities including all per-queue ones */
+  	uint64_t rx_offload_capa;
+  	/** All Tx offload capabilities including all per-queue ones */
+  	uint64_t tx_offload_capa;
+  	/** Device per-queue Rx offload capabilities. */
+  	uint64_t rx_queue_offload_capa;
+  	/** Device per-queue Tx offload capabilities. */
+  	uint64_t tx_queue_offload_capa;
+  	/** Device redirection table size, the total number of entries. */
+  	uint16_t reta_size;
+  	uint8_t hash_key_size; /**< Hash key size in bytes */
+  	/** Bit mask of RSS offloads, the bit offset also means flow type */
+  	uint64_t flow_type_rss_offloads;
+  	struct rte_eth_rxconf default_rxconf; /**< Default Rx configuration */
+  	struct rte_eth_txconf default_txconf; /**< Default Tx configuration */
+  	uint16_t vmdq_queue_base; /**< First queue ID for VMDq pools. */
+  	uint16_t vmdq_queue_num;  /**< Queue number for VMDq pools. */
+  	uint16_t vmdq_pool_base;  /**< First ID of VMDq pools. */
+  	struct rte_eth_desc_lim rx_desc_lim;  /**< Rx descriptors limits */
+  	struct rte_eth_desc_lim tx_desc_lim;  /**< Tx descriptors limits */
+  	uint32_t speed_capa;  /**< Supported speeds bitmap (RTE_ETH_LINK_SPEED_). */
+  	/** Configured number of Rx/Tx queues */
+  	uint16_t nb_rx_queues; /**< Number of Rx queues. */
+  	uint16_t nb_tx_queues; /**< Number of Tx queues. */
+    // this is line 315
+  	/** Rx parameter recommendations */
+  	struct rte_eth_dev_portconf default_rxportconf;
+  	/** Tx parameter recommendations */
+  	struct rte_eth_dev_portconf default_txportconf;
+  	/** Generic device capabilities (RTE_ETH_DEV_CAPA_). */
+  	uint64_t dev_capa;
+  	/**
+  	 * Switching information for ports on a device with a
+  	 * embedded managed interconnect/switch.
+  	 */
+  	struct rte_eth_switch_info switch_info;
+  
+  	uint64_t reserved_64s[2]; /**< Reserved for future fields */
+  	void *reserved_ptrs[2];   /**< Reserved for future fields */
+  }; // line 330
 
 	struct libmoon_device_config {
 		uint32_t port;
