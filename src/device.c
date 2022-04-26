@@ -129,7 +129,7 @@ int dpdk_configure_device(struct libmoon_device_config* cfg) {
 			.mq_mode = cfg->enable_rss ? ETH_MQ_RX_RSS : ETH_MQ_RX_NONE,
 			.split_hdr_size = 0,
 			.offloads = rx_offloads,
-			.mtu = dev_info.max_rx_pktlen
+			.mtu = dev_info.max_rx_pktlen - 26, // 26 is ICE_ETH_OVERHEAD defined in dpdk. This is dirty as it is device specific whereas this code here isnt.
 		},
 		.txmode = {
 			.mq_mode = ETH_MQ_TX_NONE,
