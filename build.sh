@@ -58,15 +58,19 @@ make install DESTDIR=$(pwd)
 (
 cd deps/dpdk
 #build DPDK with the right configuration
-make config T=x86_64-native-linux-gcc O=x86_64-native-linux-gcc
-sed -ri 's,(CONFIG_RTE_LIBRTE_IEEE1588=).*,\1y,' x86_64-native-linux-gcc/.config
-if ${MLX5} ; then
-	sed -ri 's,(MLX5_PMD=).*,\1y,' x86_64-native-linux-gcc/.config
-fi
-if ${MLX4} ; then
-	sed -ri 's,(MLX4_PMD=).*,\1y,' x86_64-native-linux-gcc/.config
-fi
-make -j $NUM_CPUS O=x86_64-native-linux-gcc
+mkdir build
+meson ./build
+cd build
+meson configure -Dtests=false -Denable_kmods=false -Dexamples=helloworld -Ddisable_drivers=kni -Ddefault_library=shared -Dmachine=nehalem -Dmax_lcores=256
+# TODO probably needs replacing, but doesnt work with new meson build system
+# sed -ri 's,(CONFIG_RTE_LIBRTE_IEEE1588=).*,\1y,' x86_64-native-linux-gcc/.config
+# if ${MLX5} ; then
+# 	sed -ri 's,(MLX5_PMD=).*,\1y,' x86_64-native-linux-gcc/.config
+# fi
+# if ${MLX4} ; then
+# 	sed -ri 's,(MLX4_PMD=).*,\1y,' x86_64-native-linux-gcc/.config
+# fi
+ninja
 )
 
 (
