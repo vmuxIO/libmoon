@@ -79,7 +79,8 @@ local log   = require "log"
 -- end
 -- 
 function dev:enableRxTimestamps(queue, udpPort)
-	local ret = dpdkc.rte_eth_timesync_enable(self.id)
+  log:error("foo: %d, %d, %d", self.id or -1, queue.id or -1, udpPort or -1)
+  local ret = dpdkc.rte_eth_timesync_enable(queue.id)
   if ret ~= 0 then
 	  log:warn("rte eth timesync fialed: %d", ret)
   end
@@ -87,7 +88,7 @@ end
 -- -- just rte_eth_timesync_enable doesn't do the trick :(
 -- function dev:enableRxTimestamps(queue, udpPort)
 -- 	udpPort = udpPort or 319
--- 	dpdkc.rte_eth_timesync_enable(self.id)
+-- 	dpdkc.rte_eth_timesync_enable(self.id) -- TODO self.id is always nil
 -- 	-- enable timestamping UDP packets as well
 -- 	local val = dpdkc.read_reg32(self.id, TSYNCRXCTL)
 -- 	val = bit.band(val, bit.bnot(TSYNCRXCTL_TYPE_MASK))
@@ -99,9 +100,25 @@ end
 -- end
 -- 
 -- could skip a few registers here, but doesn't matter
-dev.enableTxTimestamps = dev.enableRxTimestamps
--- 
+--dev.enableTxTimestamps = dev.enableRxTimestamps
+function dev:enableTxTimestamps(queue)
+  self:enableRxTimestamps(queue, 0)
+end
+
+function dev:disableTimestamps(queue)
+	local ret = dpdkc.rte_eth_timesync_disable(queue.id)
+  if ret ~= 0 then
+	  log:warn("rte eth timesync disable fialed: %d", ret)
+  end
+end
+
+
+  --log:error("this does not work")
+function dev:hasRxTimestamp()
+  return -1 -- btw: -1 == true && special case when seq nr dont work
+end
 -- function dev:hasRxTimestamp()
+--   -- check rte_mbuf.ol_flags for PKT_RX_IEEE1588_PTP instead
 -- 	if bit.band(dpdkc.read_reg32(self.id, TSYNCRXCTL), TSYNCRXCTL_RXTT) == 0 then
 -- 		return nil
 -- 	end
@@ -109,7 +126,7 @@ dev.enableTxTimestamps = dev.enableRxTimestamps
 -- 	local res = bswap16(bit.rshift(dpdkc.read_reg32(self.id, RXSATRH), 16))
 -- 	return res
 -- end
--- 
+
 -- function dev:filterL2Timestamps(queue)
 -- 	-- DPDK's init function configures ETQF3 to enable PTP L2 timestamping, so use this one
 -- 	dpdkc.write_reg32(self.id, ETQS_3, bit.bor(ETQS_QUEUE_ENABLE, bit.lshift(queue.qid, ETQS_RX_QUEUE_OFFS)))
