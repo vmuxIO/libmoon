@@ -509,12 +509,16 @@ function dev:clearTimestamps()
 end
 
 function dev:getTxTimestamp(queue, wait)
+	wait = wait or 500
 	local ts = ffi.new("struct timespec")
 	return waitForFunc(wait, function()
 		local res = dpdkc.rte_eth_timesync_read_tx_timestamp(self.id, ts)
 		if res == 0 then
 			return tonumber(ts.tv_sec) * 10^9 + tonumber(ts.tv_nsec)
-		end
+    else
+      log:error("timesync read tx error: %d", res)
+      return res
+    end
 	end)
 end
 
@@ -525,13 +529,16 @@ function dev:getRxTimestamp(queue, wait, timesync)
 		local res = dpdkc.rte_eth_timesync_read_rx_timestamp(self.id, ts, timesync or 0)
 		if res == 0 then
 			return tonumber(ts.tv_sec) * 10^9 + tonumber(ts.tv_nsec)
-		end
+    else
+      log:error("timesync read rx error: %d", res)
+      return res
+    end
 	end)
 end
 
 --- Checks whether a RX timestamp is available on the device.
 function dev:hasRxTimestamp()
-	self:unsupported("rx timestamping")
+	self:unsupported("checking rx timestamps")
 end
 
 --- Reads the clock of the device
