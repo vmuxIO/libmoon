@@ -21,12 +21,12 @@ local dev = device.__devicePrototype
 
 ffi.cdef[[
 
-/**
- * Feature filter types
+/*
+ * Legacy ethdev API used internally by drivers.
  */
+
 enum rte_filter_type {
 	RTE_ETH_FILTER_NONE = 0,
-	RTE_ETH_FILTER_MACVLAN,
 	RTE_ETH_FILTER_ETHERTYPE,
 	RTE_ETH_FILTER_FLEXIBLE,
 	RTE_ETH_FILTER_SYN,
@@ -35,8 +35,6 @@ enum rte_filter_type {
 	RTE_ETH_FILTER_FDIR,
 	RTE_ETH_FILTER_HASH,
 	RTE_ETH_FILTER_L2_TUNNEL,
-	RTE_ETH_FILTER_GENERIC,
-	RTE_ETH_FILTER_MAX
 };
 
 /**
