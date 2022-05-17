@@ -62,6 +62,12 @@ struct libmoon_device_config {
 };
 
 int dpdk_configure_device(struct libmoon_device_config* cfg) {
+  // Dpdks vector path does not support tx timestamping (at least for the ice
+  // driver). Therefore we set scalar path before initializing anything.
+  rte_vect_set_max_simd_bitwidth(RTE_VECT_SIMD_DISABLED);
+  printf("vect mode %d\n", rte_vect_get_max_simd_bitwidth());
+
+  // configure device
 	const char* driver = dpdk_get_driver_name(cfg->port);
 	bool is_i40e_device = strcmp("net_i40e", driver) == 0;
 	struct rte_eth_dev_info dev_info;
