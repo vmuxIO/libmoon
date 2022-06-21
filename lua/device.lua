@@ -554,7 +554,8 @@ function dev:filterL2Timestamps(queue)
 	if qid == 0 then
 		return
 	end
-	self:l2Filter(eth.TYPE_PTP, queue)
+  log:error("skipping l2 PTP filter")
+  self:l2Filter(eth.TYPE_PTP, queue)
 end
 
 --- @deprecated

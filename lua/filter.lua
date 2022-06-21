@@ -720,8 +720,10 @@ struct rte_eth_l2_tunnel_conf {
 	uint32_t pool; /* destination pool for tag based forwarding */
 };
 
-int rte_eth_dev_filter_ctrl(uint16_t port_id, enum rte_filter_type filter_type, enum rte_filter_op filter_op, void *arg);
+
+int rte_eth_dev_etype_filter(uint16_t port_id, uint16_t etype, int on);
 ]]
+--int rte_eth_dev_filter_ctrl(uint16_t port_id, enum rte_filter_type filter_type, enum rte_filter_op filter_op, void *arg);
 
 local RTE_ETHTYPE_FLAGS_MAC  = 1
 local RTE_ETHTYPE_FLAGS_DROP = 2
@@ -783,7 +785,9 @@ function dev:l2Filter(etype, queue)
 			log:err("DROP")
 		end
 		local filter = ffi.new("struct rte_eth_ethertype_filter", { ether_type = etype, flags = 0, queue = queue })
-		local ok = C.rte_eth_dev_filter_ctrl(self.id, C.RTE_ETH_FILTER_ETHERTYPE, C.RTE_ETH_FILTER_ADD, filter)
+		log:warn("calling etype_filter_set: %d", etype)
+		local ok = C.rte_eth_dev_etype_filter(self.id, etype, 1)
+		--local ok = C.rte_eth_dev_filter_ctrl(self.id, C.RTE_ETH_FILTER_ETHERTYPE, C.RTE_ETH_FILTER_ADD, filter)
 		if ok ~= 0 and ok ~= -38 then -- -38 means duplicate filter for some reason
 			log:warn("l2 filter error: " .. strError(ok))
 		end
