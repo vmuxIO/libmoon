@@ -551,11 +551,13 @@ end
 
 function dev:filterL2Timestamps(queue)
 	local qid = type(queue) == "number" and queue or queue.qid
-	if qid == 0 then
-		return
-	end
-  log:error("skipping l2 PTP filter")
+	--if qid == 0 then
+    --log:warn("not setting l2 filter for queue 0")
+		--return
+	--end
+  log:error("doing l2 PTP filter")
   self:l2Filter(eth.TYPE_PTP, queue)
+  --self:l2Filter(0x1234, queue)
 end
 
 --- @deprecated
