@@ -5,9 +5,9 @@
 	branch = v2.1
 [submodule "deps/dpdk"]
 	path = deps/dpdk
-	url = https://github.com/emmericp/dpdk
+	url = https://github.com/vmuxIO/dpdk
 	ignore = untracked
-	branch = v19.05-libmoon
+	branch = 21.11-moon-vmux
 [submodule "deps/pciids"]
 	path = deps/pciids
 	url = https://github.com/emmericp/pciids
